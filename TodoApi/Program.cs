@@ -28,7 +28,19 @@ app.MapGet("/api/todos", () => Results.Ok(todos));
 app.MapGet("/api/todos/{id}", (int id) =>
 {
     var todo = todos.FirstOrDefault(t => t.Id == id);
+
     return todo is not null ? Results.Ok(todo) : Results.NotFound();
 });
+
+app.MapPost("/api/todos", (TodoPostDto Dto) =>
+{
+    var newId = todos.Count == 0 ? 1 : todos.Max(t => t.Id) + 1;
+
+    var todo = new TodoGetDto(newId, Dto.Title, false);
+    todos.Add(todo);
+
+    return Results.Created($"/api/todos/{todo.Id}", todo);
+});
+
 
 app.Run();
